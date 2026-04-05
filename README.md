@@ -1,0 +1,15 @@
+# Cloud Onboarding User Journey
+
+This is a prototype of the proposed user journey flow for cloud account onboarding in AccuKnox. It covers the full onboarding experience across AWS, Azure, and GCP — including both standalone account and organization-level flows.
+
+## Running locally
+
+```bash
+# Install dependencies
+npm i
+
+# Start the development server
+npm run dev
+```
+
+Open `http://localhost:5173` in your browser.
