@@ -1,0 +1,158 @@
+SAMPLE DATA — Cloud Onboarding User Journey
+============================================
+Use these values to fill in the forms while exploring the prototype.
+Fields marked with (*) are paste-back values (simulating what you'd copy
+from the cloud provider after the deployment step).
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AWS — STANDALONE ACCOUNT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Step 1 — Account Details
+  Account Name       : my-prod-account
+  AWS Account ID     : 123456789012
+  Label              : Production
+  Tag                : Critical
+  Management Account : No
+  Partition          : AWS Global
+  Regions            : US East (N. Virginia), EU (Ireland)
+
+Step 2 — Deploy Role
+  (Click "Deploy in AWS Console", then paste back the role ARN)
+  * IAM Role ARN     : arn:aws:iam::123456789012:role/AccuKnox-CrossAccount-Role
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AWS — ORGANIZATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Step 1 — Management Account
+  Management Account : Prod Management Account (111122223333)  [select from dropdown]
+  AWS Org ID         : o-ab12cd34ef
+  IAM Role Name      : AccuKnox-OrgRole
+
+Step 2 — Permissions
+  Enable all toggles as desired (Monitoring is locked on)
+
+Step 3 — Deploy Role
+  (Click "Deploy in AWS Console", then paste back the role ARN)
+  * IAM Role ARN     : arn:aws:iam::111122223333:role/AccuKnox-OrgRole
+
+Step 4 — OU Scope
+  Scope              : All OUs
+  Root OU ID         : r-ab12
+
+  — or to include only specific OUs —
+  Scope              : Include
+  Root OU ID         : r-ab12
+  OU IDs             : ou-root-abc12345, ou-root-def67890
+
+  — or to exclude specific OUs —
+  Scope              : Exclude
+  Root OU ID         : r-ab12
+  OU IDs             : ou-root-ghi11223, ou-root-jkl44556
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AZURE — STANDALONE SUBSCRIPTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Step 1 — Subscription Details
+  Display Name       : My Azure Subscription
+  Subscription ID    : a1b2c3d4-e5f6-7890-abcd-ef1234567890
+  Tenant ID          : 11111111-2222-3333-4444-555555555555
+  Label              : Production
+  Tag                : Critical
+
+Step 2 — Permissions
+  Enable all toggles as desired (Monitoring is locked on)
+
+Step 3 — Deploy App Registration
+  (Click "Deploy in Azure Portal", then paste back both IDs)
+  * Application (Client) ID : b2c3d4e5-f6a7-8901-bcde-f12345678901
+  * Directory (Tenant) ID   : 11111111-2222-3333-4444-555555555555
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AZURE — ORGANIZATION (TENANT)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Step 1 — Tenant Details
+  Display Name            : Contoso Azure Org
+  Tenant ID               : 11111111-2222-3333-4444-555555555555
+  Root Management Group ID: mg-contoso-root
+
+Step 2 — Permissions
+  Enable all toggles as desired (Monitoring is locked on)
+  Auto-sync subscription structure: On
+
+Step 3 — Deploy Lighthouse
+  (Click "Deploy in Azure Portal", tick the confirmation checkbox)
+
+Step 4 — Scope
+  Scope                   : All subscriptions
+  Root Management Group ID: mg-contoso-root
+
+  — or to include only specific management groups —
+  Scope                   : Include
+  Root Management Group ID: mg-contoso-root
+  Management Group IDs    : mg-prod, mg-security
+
+  — or to exclude specific management groups —
+  Scope                   : Exclude
+  Root Management Group ID: mg-contoso-root
+  Management Group IDs    : mg-sandbox, mg-dev
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GCP — STANDALONE PROJECT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Step 1 — Project Details
+  Display Name       : My GCP Project
+  Project ID         : my-gcp-project-01
+  Project Number     : 123456789012
+  Label              : Production
+  Tag                : Critical
+
+Step 2 — Permissions
+  Enable all toggles as desired (Monitoring is locked on)
+
+Step 3 — Deploy via Cloud Shell
+  (Click "Open Cloud Shell & Run Script", then paste back all three values)
+  * WIF Pool ID      : projects/123456789012/locations/global/workloadIdentityPools/accuknox-wif-pool
+  * WIF Provider ID  : projects/123456789012/locations/global/workloadIdentityPools/accuknox-wif-pool/providers/accuknox-oidc-provider
+  * Service Account  : accuknox-integration@my-gcp-project-01.iam.gserviceaccount.com
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GCP — ORGANIZATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Step 1 — Organization Details
+  Display Name              : My GCP Org
+  Organization ID           : 123456789012
+  Orchestrator Project ID   : accuknox-orchestrator-01
+  Orchestrator Project Number: 987654321098
+
+Step 2 — Permissions
+  Enable all toggles as desired (Monitoring is locked on)
+  Auto-enroll new GCP projects: On
+
+Step 3 — Deploy via Cloud Shell
+  (Click "Open Cloud Shell & Run Script", tick the confirmation checkbox)
+
+Step 4 — Scope
+  Scope                     : All projects
+  Root Folder ID            : folders/123456789
+
+  — or to include only specific folders —
+  Scope                     : Include
+  Root Folder ID            : folders/123456789
+  Folder / Org IDs          : folders/111111, folders/222222
+
+  — or to exclude specific folders —
+  Scope                     : Exclude
+  Root Folder ID            : folders/123456789
+  Folder / Org IDs          : folders/333333, folders/444444

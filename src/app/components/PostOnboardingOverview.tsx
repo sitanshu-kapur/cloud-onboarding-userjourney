@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, ReactNode } from "react";
 import {
   CheckCircle2,
   AlertTriangle,
@@ -746,6 +746,133 @@ function GCPOrgContent({ data }: { data: GCPOrgFormData }) {
   );
 }
 
+/* ─── mock form data for non-active orgs in multi-cloud view ─── */
+
+const MOCK_AWS_ORG_DATA: OrgFormData = {
+  managementMethod: "select",
+  managementAccountId: "111122223333",
+  managementRoleArn: "",
+  awsOrgId: "o-ab12cd34ef",
+  iamRoleName: "AccuKnox-OrgRole",
+  permissions: { monitoring: true, remediation: true, dataScanning: true, workloadEC2: true, workloadECR: false },
+  autoSyncFolder: true,
+  iamRoleArn: "arn:aws:iam::111122223333:role/AccuKnox-OrgRole",
+  ouScope: "all",
+  rootOuId: "r-ab12",
+  ouIds: "",
+};
+
+const MOCK_AZURE_ORG_DATA: AzureOrgFormData = {
+  displayName: "Contoso Azure Org",
+  tenantId: "11111111-2222-3333-4444-555555555555",
+  managementGroupId: "mg-contoso-root",
+  permissions: { monitoring: true, remediation: true, dataScanning: true, workloadVMs: true, workloadACR: false },
+  autoSyncSubscriptions: true,
+  scope: "all",
+  rootManagementGroupId: "mg-contoso-root",
+  scopeIds: "",
+};
+
+const MOCK_GCP_ORG_DATA: GCPOrgFormData = {
+  displayName: "My GCP Org",
+  orgId: "123456789012",
+  orchestratorProjectId: "accuknox-orchestrator-01",
+  orchestratorProjectNumber: "987654321098",
+  permissions: { monitoring: true, remediation: true, dataScanning: true, workloadCompute: true, workloadGKE: false },
+  autoEnrollNewProjects: true,
+  scope: "all",
+  rootFolderId: "folders/123456789",
+  scopeIds: "",
+};
+
+/* ─── cloud org section wrapper ─── */
+
+function CloudOrgSection({
+  cloud,
+  isNew,
+  children,
+}: {
+  cloud: "aws" | "azure" | "gcp";
+  isNew: boolean;
+  children: ReactNode;
+}) {
+  const CLOUD_CONFIG = {
+    aws: {
+      bg: "#232F3E",
+      label: "Amazon Web Services",
+      logo: <span className="text-[#FF9900] font-bold text-xs tracking-wide">AWS</span>,
+    },
+    azure: {
+      bg: "#0078D4",
+      label: "Microsoft Azure",
+      logo: (
+        <svg viewBox="0 0 18 14" width="18" height="14" fill="none">
+          <path d="M6.5 0L0 14h4.5L9 5.5 13.5 14H18L11.5 0H6.5Z" fill="white" fillOpacity="0.9" />
+        </svg>
+      ),
+    },
+    gcp: {
+      bg: "#4285F4",
+      label: "Google Cloud Platform",
+      logo: <span className="text-white font-bold text-xs tracking-wide">GCP</span>,
+    },
+  };
+  const { bg, label, logo } = CLOUD_CONFIG[cloud];
+
+  return (
+    <div className="rounded-xl border border-[#E2E8F0] overflow-hidden shadow-sm">
+      <div className="flex items-center justify-between px-5 py-3" style={{ backgroundColor: bg }}>
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-md bg-white/15 flex items-center justify-center shrink-0">
+            {logo}
+          </div>
+          <span className="text-white font-semibold text-sm">{label}</span>
+        </div>
+        {isNew ? (
+          <span className="flex items-center gap-1.5 text-xs bg-white/20 text-white border border-white/30 px-2.5 py-0.5 rounded-full font-medium">
+            <CheckCircle2 size={11} />
+            Just Connected
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 text-xs bg-white/10 text-white/70 border border-white/20 px-2.5 py-0.5 rounded-full font-medium">
+            <CheckCircle2 size={11} />
+            Connected
+          </span>
+        )}
+      </div>
+      <div className="p-5 bg-[#F8FAFC] flex flex-col gap-4">{children}</div>
+    </div>
+  );
+}
+
+/* ─── multi-cloud org overview ─── */
+
+function MultiCloudOrgOverview({
+  activeCloud,
+  data,
+}: {
+  activeCloud: "aws" | "azure" | "gcp";
+  data: OrgFormData | AzureOrgFormData | GCPOrgFormData;
+}) {
+  const awsData = activeCloud === "aws" ? (data as OrgFormData) : MOCK_AWS_ORG_DATA;
+  const azureData = activeCloud === "azure" ? (data as AzureOrgFormData) : MOCK_AZURE_ORG_DATA;
+  const gcpData = activeCloud === "gcp" ? (data as GCPOrgFormData) : MOCK_GCP_ORG_DATA;
+
+  return (
+    <div className="flex flex-col gap-6">
+      <CloudOrgSection cloud="aws" isNew={activeCloud === "aws"}>
+        <OrgContent data={awsData} />
+      </CloudOrgSection>
+      <CloudOrgSection cloud="azure" isNew={activeCloud === "azure"}>
+        <AzureOrgContent data={azureData} />
+      </CloudOrgSection>
+      <CloudOrgSection cloud="gcp" isNew={activeCloud === "gcp"}>
+        <GCPOrgContent data={gcpData} />
+      </CloudOrgSection>
+    </div>
+  );
+}
+
 /* ─── main component ─── */
 
 type PostOnboardingOverviewProps =
@@ -758,20 +885,20 @@ type PostOnboardingOverviewProps =
 
 const BADGE_CONFIG: Record<PostOnboardingOverviewProps["flowType"], { label: string; color: string }> = {
   standalone: { label: "AWS Account Connected", color: "bg-[#F0FDF4] text-[#16A34A] border-[#86EFAC]" },
-  org: { label: "AWS Organization Connected", color: "bg-[#EFF6FF] text-[#2563EB] border-[#BFDBFE]" },
+  org: { label: "3 Organizations Connected", color: "bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]" },
   "azure-standalone": { label: "Azure Subscription Connected", color: "bg-[#EFF6FF] text-[#0078D4] border-[#BFDBFE]" },
-  "azure-org": { label: "Azure Organization Connected", color: "bg-[#EFF6FF] text-[#0078D4] border-[#BFDBFE]" },
+  "azure-org": { label: "3 Organizations Connected", color: "bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]" },
   "gcp-standalone": { label: "GCP Project Connected", color: "bg-[#E8F0FE] text-[#4285F4] border-[#AECBFA]" },
-  "gcp-org": { label: "GCP Organization Connected", color: "bg-[#E8F0FE] text-[#4285F4] border-[#AECBFA]" },
+  "gcp-org": { label: "3 Organizations Connected", color: "bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]" },
 };
 
 const SUBTITLE_CONFIG: Record<PostOnboardingOverviewProps["flowType"], string> = {
   standalone: "Your AWS account has been connected to AccuKnox. Scanning is underway.",
-  org: "Your AWS Organization has been connected to AccuKnox. Scanning is underway.",
+  org: "Your AWS Organization has been connected. All connected cloud organizations are shown below.",
   "azure-standalone": "Your Azure subscription has been connected to AccuKnox. Scanning is underway.",
-  "azure-org": "Your Azure organization has been connected to AccuKnox. Subscription discovery is underway.",
+  "azure-org": "Your Azure Organization has been connected. All connected cloud organizations are shown below.",
   "gcp-standalone": "Your GCP project has been connected to AccuKnox. Scanning is underway.",
-  "gcp-org": "Your GCP organization has been connected to AccuKnox. Project discovery is underway.",
+  "gcp-org": "Your GCP Organization has been connected. All connected cloud organizations are shown below.",
 };
 
 export function PostOnboardingOverview(props: PostOnboardingOverviewProps) {
@@ -820,12 +947,12 @@ export function PostOnboardingOverview(props: PostOnboardingOverviewProps) {
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-auto px-8 py-6 flex flex-col gap-5">
-        {props.flowType === "org" && <OrgContent data={props.data} />}
         {props.flowType === "standalone" && <StandaloneContent data={props.data} />}
         {props.flowType === "azure-standalone" && <AzureStandaloneContent data={props.data} />}
-        {props.flowType === "azure-org" && <AzureOrgContent data={props.data} />}
         {props.flowType === "gcp-standalone" && <GCPStandaloneContent data={props.data} />}
-        {props.flowType === "gcp-org" && <GCPOrgContent data={props.data} />}
+        {props.flowType === "org" && <MultiCloudOrgOverview activeCloud="aws" data={props.data} />}
+        {props.flowType === "azure-org" && <MultiCloudOrgOverview activeCloud="azure" data={props.data} />}
+        {props.flowType === "gcp-org" && <MultiCloudOrgOverview activeCloud="gcp" data={props.data} />}
 
         {/* Amber migration banner — always shown */}
         <AmberMigrationBanner />

@@ -13,3 +13,7 @@ npm run dev
 ```
 
 Open `http://localhost:5173` in your browser.
+
+## Sample data
+
+`SAMPLE_DATA.txt` contains copy-paste values for every field across all six flows (AWS standalone/org, Azure standalone/org, GCP standalone/org), including scoping examples for include/exclude configurations and the paste-back values expected after the cloud deployment steps.
