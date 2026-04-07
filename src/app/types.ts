@@ -193,7 +193,7 @@ export const GCP_ORG_STEPS = [
 ];
 
 export const GCP_AUTO_GENERATED = {
-  accuknoxOidcIssuer: "https://oidc.accuknox.io",
+  accuknoxOidcIssuer: "https://oidc.accuknox.com",
   integrationId: "ak-gcp-9f3e2b1a8c7d",
   serviceAccountName: "accuknox-integration",
   workloadPoolId: "accuknox-wif-pool",
