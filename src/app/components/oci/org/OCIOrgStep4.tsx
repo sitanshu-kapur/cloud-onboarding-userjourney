@@ -1,3 +1,4 @@
+import { Info } from "lucide-react";
 import { OCIOrgFormData } from "../../../types";
 
 interface Props {
@@ -17,9 +18,18 @@ export function OCIOrgStep4({ data, onChange, onNext, onBack }: Props) {
     <div className="flex flex-col flex-1 min-h-0">
       <div className="flex-1 overflow-auto px-8 py-6">
         <h2 className="text-[#1E293B] mb-1">Tenancy Scope</h2>
-        <p className="text-sm text-[#64748B] mb-6">
+        <p className="text-sm text-[#64748B] mb-4">
           Choose which child tenancies AccuKnox should monitor within your OCI Organization.
         </p>
+
+        <div className="flex items-start gap-3 bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg p-3.5 mb-5 max-w-xl">
+          <Info size={15} className="text-[#2563EB] shrink-0 mt-0.5" />
+          <p className="text-sm text-[#1E40AF]">
+            <span className="font-medium">Different from compartment scope.</span> The script has already run and reported
+            your full list of child tenancies to AccuKnox. This step is a backend filter — it controls which of those
+            tenancies AccuKnox will actively monitor. It does not re-run or modify anything in OCI.
+          </p>
+        </div>
 
         <div className="max-w-xl flex flex-col gap-5">
           <div className="flex flex-col gap-3">

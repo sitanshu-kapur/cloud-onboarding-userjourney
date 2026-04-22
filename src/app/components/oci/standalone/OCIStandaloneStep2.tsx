@@ -85,7 +85,9 @@ export function OCIStandaloneStep2({ data, onChange, onNext, onBack }: Props) {
           <div className="mt-2 pt-5 border-t border-[#E2E8F0]">
             <h3 className="text-sm font-semibold text-[#1E293B] mb-1">Compartment Scope</h3>
             <p className="text-xs text-[#64748B] mb-3">
-              OCI organizes resources into compartments. Scope monitoring to all compartments or specific ones.
+              Compartments are resource namespaces within your tenancy (VMs, databases, storage, etc. are grouped into compartments).
+              This selection is written into the IAM policy the script creates —{" "}
+              <span className="font-medium text-[#C74634]">configure it before running the script in the next step.</span>
             </p>
             <div className="flex gap-3 mb-3">
               {(["all", "include", "exclude"] as const).map(opt => (

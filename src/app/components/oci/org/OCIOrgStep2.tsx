@@ -67,8 +67,13 @@ export function OCIOrgStep2({ data, onChange, onNext, onBack }: Props) {
 
           {/* Compartment scope */}
           <div className="mt-2 pt-5 border-t border-[#E2E8F0]">
-            <h3 className="text-sm font-semibold text-[#1E293B] mb-1">Default Compartment Scope</h3>
-            <p className="text-xs text-[#64748B] mb-3">Applied uniformly across all onboarded tenancies.</p>
+            <h3 className="text-sm font-semibold text-[#1E293B] mb-1">Compartment Scope</h3>
+            <p className="text-xs text-[#64748B] mb-3">
+              Compartments are resource namespaces <span className="font-medium text-[#1E293B]">within</span> a tenancy (similar to folders for VMs, databases, storage, etc.).
+              This selection is embedded directly into the IAM policy the script creates —{" "}
+              <span className="font-medium text-[#C74634]">set it here before running the script in the next step.</span>{" "}
+              Tenancy scope (which child tenancies to include) is configured separately after deployment.
+            </p>
             <div className="flex gap-3 mb-3">
               {(["all", "include", "exclude"] as const).map(opt => (
                 <button
