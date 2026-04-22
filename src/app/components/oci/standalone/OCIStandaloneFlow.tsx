@@ -64,7 +64,7 @@ export function OCIStandaloneFlow({ onBack, onComplete }: Props) {
           data={data}
           showShell={showShell}
           onOpenShell={() => setShowShell(true)}
-          onShellDone={() => setShowShell(true)}
+          onShellDone={() => { setShowShell(true); setStep(3); }}
           onNext={() => setStep(3)}
           onBack={() => setStep(1)}
         />

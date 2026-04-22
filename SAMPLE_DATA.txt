@@ -156,3 +156,67 @@ Step 4 — Scope
   Scope                     : Exclude
   Root Folder ID            : folders/123456789
   Folder / Org IDs          : folders/333333, folders/444444
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OCI — STANDALONE TENANCY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Note: OCI credentials are transmitted automatically by the Cloud Shell
+script — there is NO paste-back step. "Next" unlocks after you run the
+script in Cloud Shell.
+
+Step 1 — Tenancy Details
+  Display Name       : Production OCI Tenancy
+  Tenancy OCID       : ocid1.tenancy.oc1..aaaaaaaaprodtenancy01examplevalue
+  Home Region        : US East (Ashburn) (us-ashburn-1)
+  Label              : Production
+  Tag                : Critical
+
+Step 2 — Permissions
+  Enable all toggles as desired (Monitoring is locked on)
+
+  Compartment Scope  : All compartments
+
+  — or to include only specific compartments —
+  Compartment Scope  : Include specific
+  Compartment OCIDs  : ocid1.compartment.oc1..aaaaaaaaprodcomp01examplevalue, ocid1.compartment.oc1..aaaaaaaadbcomp01examplevalue0001
+
+  — or to exclude specific compartments —
+  Compartment Scope  : Exclude specific
+  Compartment OCIDs  : ocid1.compartment.oc1..aaaaaaaasandboxcomp01examplev, ocid1.compartment.oc1..aaaaaaaadevcomp01examplevalue0
+
+Step 3 — Deploy via Cloud Shell
+  (Click "Open Cloud Shell & Run Script" — credentials are sent to
+  AccuKnox automatically. No values need to be copied back.)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OCI — ORGANIZATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Note: Same automatic callback — no paste-back required.
+
+Step 1 — Organization Details
+  Display Name         : Contoso OCI Org
+  Admin Tenancy OCID   : ocid1.tenancy.oc1..aaaaaaaaadmintenancy01examplev
+  Home Region          : US East (Ashburn) (us-ashburn-1)
+
+Step 2 — Permissions
+  Enable all toggles as desired (Monitoring is locked on)
+  Auto-sync new child tenancies: On
+
+  Compartment Scope    : All compartments  (or use include/exclude as above)
+
+Step 3 — Deploy via Cloud Shell
+  (Click "Open Cloud Shell & Run Script", tick the confirmation checkbox)
+
+Step 4 — Tenancy Scope
+  Scope                : Sync all tenancies
+  Root Tenancy OCID    : ocid1.tenancy.oc1..aaaaaaaaadmintenancy01examplev
+
+  — or to include only specific child tenancies —
+  Scope                : Include specific tenancies
+  Child Tenancy OCIDs  : ocid1.tenancy.oc1..aaaaaaaachild01tenancyexamplev, ocid1.tenancy.oc1..aaaaaaaachild02tenancyexamplev
+
+  — or to exclude specific child tenancies —
+  Scope                : Exclude specific tenancies
+  Child Tenancy OCIDs  : ocid1.tenancy.oc1..aaaaaaaasandbox01tenancyexamp, ocid1.tenancy.oc1..aaaaaaaalegacy01tenancyexample
