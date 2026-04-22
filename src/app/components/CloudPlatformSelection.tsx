@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { ChevronRight, Clock } from "lucide-react";
 
-type CloudPlatform = "aws" | "azure" | "gcp" | null;
+type CloudPlatform = "aws" | "azure" | "gcp" | "oci" | null;
 
 interface CloudPlatformSelectionProps {
-  onContinue: (platform: "aws" | "azure" | "gcp") => void;
+  onContinue: (platform: "aws" | "azure" | "gcp" | "oci") => void;
   onCancel?: () => void;
 }
 
 /* ─── provider logo badges ─── */
-function ProviderLogo({ platform }: { platform: "aws" | "azure" | "gcp" }) {
+function ProviderLogo({ platform }: { platform: "aws" | "azure" | "gcp" | "oci" }) {
   if (platform === "aws") {
     return (
       <div className="w-12 h-12 rounded-xl bg-[#232F3E] flex items-center justify-center shrink-0">
@@ -26,20 +26,27 @@ function ProviderLogo({ platform }: { platform: "aws" | "azure" | "gcp" }) {
       </div>
     );
   }
-  // GCP
+  if (platform === "gcp") {
+    return (
+      <div
+        className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+        style={{ background: "linear-gradient(135deg, #4285F4 0%, #34A853 50%, #FBBC05 75%, #EA4335 100%)" }}
+      >
+        <span className="text-white font-bold text-sm tracking-wide drop-shadow">GCP</span>
+      </div>
+    );
+  }
+  // OCI
   return (
-    <div
-      className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-      style={{ background: "linear-gradient(135deg, #4285F4 0%, #34A853 50%, #FBBC05 75%, #EA4335 100%)" }}
-    >
-      <span className="text-white font-bold text-sm tracking-wide drop-shadow">GCP</span>
+    <div className="w-12 h-12 rounded-xl bg-[#C74634] flex items-center justify-center shrink-0">
+      <span className="text-white font-bold text-sm tracking-wide">OCI</span>
     </div>
   );
 }
 
 /* ─── card data ─── */
 const PLATFORMS: {
-  id: "aws" | "azure" | "gcp";
+  id: "aws" | "azure" | "gcp" | "oci";
   name: string;
   description: string;
   detail: string;
@@ -64,6 +71,13 @@ const PLATFORMS: {
     name: "Google Cloud Platform",
     description: "Connect GCP projects or entire GCP organizations.",
     detail: "Deploys via Cloud Shell · Workload Identity Federation · Folder-level scoping",
+    comingSoon: false,
+  },
+  {
+    id: "oci",
+    name: "Oracle Cloud Infrastructure",
+    description: "Connect OCI tenancies or entire OCI Organizations.",
+    detail: "Deploys via Cloud Shell · Automated credential callback · Tenancy-level scoping",
     comingSoon: false,
   },
 ];
@@ -91,7 +105,7 @@ export function CloudPlatformSelection({ onContinue, onCancel }: CloudPlatformSe
         </p>
 
         {/* Cards */}
-        <div className="grid grid-cols-3 gap-5 max-w-3xl">
+        <div className="grid grid-cols-2 gap-5 max-w-2xl">
           {PLATFORMS.map(({ id, name, description, detail, comingSoon }) => {
             const isSelected = selected === id;
             return (
@@ -161,7 +175,7 @@ export function CloudPlatformSelection({ onContinue, onCancel }: CloudPlatformSe
         <div className="flex-1" />
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-6 border-t border-[#E2E8F0] max-w-3xl">
+        <div className="flex items-center justify-between pt-6 border-t border-[#E2E8F0] max-w-2xl">
           <button
             onClick={onCancel}
             className="px-5 py-2 rounded-lg border border-[#2563EB] text-[#2563EB] bg-white text-sm hover:bg-[#EFF6FF] transition-colors"

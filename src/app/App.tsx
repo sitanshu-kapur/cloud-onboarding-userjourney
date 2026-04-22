@@ -7,10 +7,11 @@ import { StandaloneFlow } from "./components/standalone/StandaloneFlow";
 import { OrgFlow } from "./components/org/OrgFlow";
 import { AzureFlow } from "./components/azure/AzureFlow";
 import { GCPFlow } from "./components/gcp/GCPFlow";
+import { OCIFlow } from "./components/oci/OCIFlow";
 import { PostOnboardingOverview } from "./components/PostOnboardingOverview";
-import { StandaloneFormData, OrgFormData, AzureStandaloneFormData, AzureOrgFormData, GCPStandaloneFormData, GCPOrgFormData } from "./types";
+import { StandaloneFormData, OrgFormData, AzureStandaloneFormData, AzureOrgFormData, GCPStandaloneFormData, GCPOrgFormData, OCIStandaloneFormData, OCIOrgFormData } from "./types";
 
-type AppView = "platform" | "landing" | "standalone" | "org" | "azure" | "gcp" | "complete";
+type AppView = "platform" | "landing" | "standalone" | "org" | "azure" | "gcp" | "oci" | "complete";
 type CompletedData =
   | { flowType: "standalone"; data: StandaloneFormData }
   | { flowType: "org"; data: OrgFormData }
@@ -18,6 +19,8 @@ type CompletedData =
   | { flowType: "azure-org"; data: AzureOrgFormData }
   | { flowType: "gcp-standalone"; data: GCPStandaloneFormData }
   | { flowType: "gcp-org"; data: GCPOrgFormData }
+  | { flowType: "oci-standalone"; data: OCIStandaloneFormData }
+  | { flowType: "oci-org"; data: OCIOrgFormData }
   | null;
 
 const BASE_CRUMBS = [{ label: "Settings" }, { label: "Cloud accounts" }];
@@ -50,6 +53,7 @@ export default function App() {
                   if (platform === "aws") setView("landing");
                   if (platform === "azure") setView("azure");
                   if (platform === "gcp") setView("gcp");
+                  if (platform === "oci") setView("oci");
                 }}
               />
             )}
@@ -97,6 +101,16 @@ export default function App() {
 
             {view === "gcp" && (
               <GCPFlow
+                onBack={() => setView("platform")}
+                onComplete={(result) => {
+                  setCompletedData(result);
+                  setView("complete");
+                }}
+              />
+            )}
+
+            {view === "oci" && (
+              <OCIFlow
                 onBack={() => setView("platform")}
                 onComplete={(result) => {
                   setCompletedData(result);

@@ -22,6 +22,10 @@ import {
   GCPStandaloneFormData,
   GCPOrgFormData,
   GCP_AUTO_GENERATED,
+  OCIStandaloneFormData,
+  OCIOrgFormData,
+  OCI_AUTO_GENERATED,
+  OCI_REGIONS,
 } from "../types";
 
 /* ─── mock org data ─── */
@@ -746,6 +750,155 @@ function GCPOrgContent({ data }: { data: GCPOrgFormData }) {
   );
 }
 
+/* ─── oci mock data ─── */
+
+const MOCK_OCI_TENANCIES = [
+  { name: "prod-tenancy-01", id: "ocid1.tenancy.oc1..aaaaaaaaprod01", folder: "Production", status: "connected" as const },
+  { name: "prod-db-01", id: "ocid1.tenancy.oc1..aaaaaaaaproddb01", folder: "Production", status: "syncing" as const },
+  { name: "dev-tenancy-01", id: "ocid1.tenancy.oc1..aaaaaaaadev01", folder: "Development", status: "connected" as const },
+  { name: "dev-test-01", id: "ocid1.tenancy.oc1..aaaaaaaadevtest01", folder: "Development", status: "syncing" as const },
+  { name: "security-hub-01", id: "ocid1.tenancy.oc1..aaaaaaaasechub01", folder: "Security", status: "syncing" as const },
+];
+
+const UNIQUE_OCI_GROUPS = [
+  ...new Map(MOCK_OCI_TENANCIES.map((t) => [t.folder, { name: t.folder }])).values(),
+];
+
+/* ─── oci content ─── */
+
+function OCIStandaloneContent({ data }: { data: OCIStandaloneFormData }) {
+  const regionLabel = OCI_REGIONS.find(r => r.value === data.homeRegion)?.label ?? data.homeRegion;
+  const permMap: Record<string, string> = {
+    monitoring: "Monitoring", remediation: "Remediation", dataScanning: "Data Scanning",
+    workloadVMs: "VMs & Compute", workloadContainers: "Containers & OKE",
+  };
+  const permsEnabled = Object.entries(data.permissions).filter(([, v]) => v).map(([k]) => permMap[k]).join(", ");
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { icon: <Server size={18} className="text-[#C74634]" />, bg: "bg-[#FEF2EE]", label: "Tenancy", value: data.displayName || "—" },
+          { icon: <CheckCircle2 size={18} className="text-[#16A34A]" />, bg: "bg-[#F0FDF4]", label: "Auth Method", value: "IAM User + API Key" },
+          { icon: <Shield size={18} className="text-[#64748B]" />, bg: "bg-[#F8FAFC]", label: "Last Synced", value: "Just now" },
+        ].map(({ icon, bg, label, value }) => (
+          <div key={label} className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex items-center gap-3">
+            <div className={`w-9 h-9 rounded-lg ${bg} flex items-center justify-center shrink-0`}>{icon}</div>
+            <div><p className="text-xs text-[#64748B]">{label}</p><p className="text-sm font-semibold text-[#1E293B]">{value}</p></div>
+          </div>
+        ))}
+      </div>
+      <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-[#E2E8F0] bg-[#F8FAFC]">
+          <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Tenancy Details</p>
+        </div>
+        <div className="px-5">
+          <div className="grid grid-cols-2 gap-x-8">
+            <div>
+              <DetailRow label="Display Name" value={data.displayName} />
+              <DetailRow label="Home Region" value={regionLabel} />
+              <DetailRow label="IAM User" value={OCI_AUTO_GENERATED.iamUserName} />
+            </div>
+            <div>
+              <DetailRow label="Tenancy OCID" value={data.tenancyOcid} />
+              <DetailRow label="Compartment Scope" value={data.compartmentScope === "all" ? "All compartments" : data.compartmentIds} />
+              <DetailRow label="Policy" value={OCI_AUTO_GENERATED.policyName} />
+            </div>
+          </div>
+          <div className="flex items-start gap-4 py-2.5">
+            <span className="text-sm text-[#64748B] w-44 shrink-0">Permissions</span>
+            <span className="text-sm text-[#1E293B] font-medium">{permsEnabled}</span>
+          </div>
+        </div>
+      </div>
+      <ScanStatusCard scanPercent={15} label="Scanning OCI resources in tenancy…" />
+    </div>
+  );
+}
+
+function OCIOrgContent({ data }: { data: OCIOrgFormData }) {
+  const connectedCount = MOCK_OCI_TENANCIES.filter(t => t.status === "connected").length;
+  const syncingCount = MOCK_OCI_TENANCIES.filter(t => t.status === "syncing").length;
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="grid grid-cols-4 gap-4">
+        {[
+          { icon: <Building2 size={18} className="text-[#C74634]" />, bg: "bg-[#FEF2EE]", label: "Groups", value: String(UNIQUE_OCI_GROUPS.length), color: "text-[#1E293B]" },
+          { icon: <Server size={18} className="text-[#64748B]" />, bg: "bg-[#F8FAFC]", label: "Total Tenancies", value: String(MOCK_OCI_TENANCIES.length), color: "text-[#1E293B]" },
+          { icon: <CheckCircle2 size={18} className="text-[#16A34A]" />, bg: "bg-[#F0FDF4]", label: "Connected", value: String(connectedCount), color: "text-[#16A34A]" },
+          { icon: <RefreshCw size={18} className="text-[#C74634]" />, bg: "bg-[#FEF2EE]", label: "Syncing", value: String(syncingCount), color: "text-[#C74634]" },
+        ].map(({ icon, bg, label, value, color }) => (
+          <div key={label} className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex items-center gap-3">
+            <div className={`w-9 h-9 rounded-lg ${bg} flex items-center justify-center shrink-0`}>{icon}</div>
+            <div><p className="text-xs text-[#64748B]">{label}</p><p className={`text-lg font-bold ${color}`}>{value}</p></div>
+          </div>
+        ))}
+      </div>
+      <ScanStatusCard scanPercent={11} label={`Scanning ${MOCK_OCI_TENANCIES.length} tenancies… (${connectedCount} complete)`} />
+      <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-[#E2E8F0] bg-[#F8FAFC]">
+          <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Organization Configuration</p>
+        </div>
+        <div className="px-5 grid grid-cols-2 gap-x-8">
+          <div>
+            <DetailRow label="Organization Name" value={data.displayName} />
+            <DetailRow label="Admin Tenancy OCID" value={data.adminTenancyOcid} />
+            <DetailRow label="Home Region" value={data.homeRegion} />
+          </div>
+          <div>
+            <DetailRow label="Auth Method" value="Cross-tenancy Endorse/Admit" />
+            <DetailRow label="IAM User" value={OCI_AUTO_GENERATED.iamUserName} />
+            <DetailRow label="Auto-sync Tenancies" value={data.autoSyncTenancies ? "Enabled" : "Disabled"} />
+          </div>
+        </div>
+      </div>
+      <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-[#E2E8F0] bg-[#F8FAFC] flex items-center justify-between">
+          <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Child Tenancies</p>
+          <span className="text-xs text-[#64748B]">{MOCK_OCI_TENANCIES.length} tenancies</span>
+        </div>
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-[#E2E8F0]">
+              <th className="text-left text-xs font-medium text-[#94A3B8] px-5 py-3 w-1/4">Tenancy Name</th>
+              <th className="text-left text-xs font-medium text-[#94A3B8] px-5 py-3 w-2/5">Tenancy OCID</th>
+              <th className="text-left text-xs font-medium text-[#94A3B8] px-5 py-3 w-1/5">Group</th>
+              <th className="text-left text-xs font-medium text-[#94A3B8] px-5 py-3 w-1/6">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {UNIQUE_OCI_GROUPS.map((group) => {
+              const tenancies = MOCK_OCI_TENANCIES.filter(t => t.folder === group.name);
+              return (
+                <Fragment key={group.name}>
+                  <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                    <td colSpan={4} className="px-5 py-2">
+                      <div className="flex items-center gap-2">
+                        <Building2 size={13} className="text-[#64748B]" />
+                        <span className="text-xs font-semibold text-[#475569]">{group.name}</span>
+                        <span className="ml-auto text-xs text-[#94A3B8]">{tenancies.length} tenanc{tenancies.length !== 1 ? "ies" : "y"}</span>
+                      </div>
+                    </td>
+                  </tr>
+                  {tenancies.map(t => (
+                    <tr key={t.id} className="border-b border-[#E2E8F0] last:border-0 hover:bg-[#F8FAFC] transition-colors">
+                      <td className="px-5 py-3 text-sm text-[#1E293B] font-medium pl-9">{t.name}</td>
+                      <td className="px-5 py-3 text-xs text-[#64748B] font-mono">{t.id}</td>
+                      <td className="px-5 py-3 text-sm text-[#64748B]">{t.folder}</td>
+                      <td className="px-5 py-3"><StatusBadge status={t.status} /></td>
+                    </tr>
+                  ))}
+                </Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 /* ─── mock form data for non-active orgs in multi-cloud view ─── */
 
 const MOCK_AWS_ORG_DATA: OrgFormData = {
@@ -785,6 +938,19 @@ const MOCK_GCP_ORG_DATA: GCPOrgFormData = {
   scopeIds: "",
 };
 
+const MOCK_OCI_ORG_DATA: OCIOrgFormData = {
+  displayName: "Contoso OCI Org",
+  adminTenancyOcid: "ocid1.tenancy.oc1..aaaaaaaaadmintenancy",
+  homeRegion: "us-ashburn-1",
+  permissions: { monitoring: true, remediation: true, dataScanning: true, workloadVMs: true, workloadContainers: false },
+  autoSyncTenancies: true,
+  compartmentScope: "all",
+  compartmentIds: "",
+  scope: "all",
+  rootTenancyOcid: "ocid1.tenancy.oc1..aaaaaaaaadmintenancy",
+  scopeIds: "",
+};
+
 /* ─── cloud org section wrapper ─── */
 
 function CloudOrgSection({
@@ -792,7 +958,7 @@ function CloudOrgSection({
   isNew,
   children,
 }: {
-  cloud: "aws" | "azure" | "gcp";
+  cloud: "aws" | "azure" | "gcp" | "oci";
   isNew: boolean;
   children: ReactNode;
 }) {
@@ -815,6 +981,11 @@ function CloudOrgSection({
       bg: "#4285F4",
       label: "Google Cloud Platform",
       logo: <span className="text-white font-bold text-xs tracking-wide">GCP</span>,
+    },
+    oci: {
+      bg: "#C74634",
+      label: "Oracle Cloud Infrastructure",
+      logo: <span className="text-white font-bold text-xs tracking-wide">OCI</span>,
     },
   };
   const { bg, label, logo } = CLOUD_CONFIG[cloud];
@@ -851,12 +1022,13 @@ function MultiCloudOrgOverview({
   activeCloud,
   data,
 }: {
-  activeCloud: "aws" | "azure" | "gcp";
-  data: OrgFormData | AzureOrgFormData | GCPOrgFormData;
+  activeCloud: "aws" | "azure" | "gcp" | "oci";
+  data: OrgFormData | AzureOrgFormData | GCPOrgFormData | OCIOrgFormData;
 }) {
   const awsData = activeCloud === "aws" ? (data as OrgFormData) : MOCK_AWS_ORG_DATA;
   const azureData = activeCloud === "azure" ? (data as AzureOrgFormData) : MOCK_AZURE_ORG_DATA;
   const gcpData = activeCloud === "gcp" ? (data as GCPOrgFormData) : MOCK_GCP_ORG_DATA;
+  const ociData = activeCloud === "oci" ? (data as OCIOrgFormData) : MOCK_OCI_ORG_DATA;
 
   return (
     <div className="flex flex-col gap-6">
@@ -868,6 +1040,9 @@ function MultiCloudOrgOverview({
       </CloudOrgSection>
       <CloudOrgSection cloud="gcp" isNew={activeCloud === "gcp"}>
         <GCPOrgContent data={gcpData} />
+      </CloudOrgSection>
+      <CloudOrgSection cloud="oci" isNew={activeCloud === "oci"}>
+        <OCIOrgContent data={ociData} />
       </CloudOrgSection>
     </div>
   );
@@ -881,15 +1056,19 @@ type PostOnboardingOverviewProps =
   | { flowType: "azure-standalone"; data: AzureStandaloneFormData; onDashboard: () => void }
   | { flowType: "azure-org"; data: AzureOrgFormData; onDashboard: () => void }
   | { flowType: "gcp-standalone"; data: GCPStandaloneFormData; onDashboard: () => void }
-  | { flowType: "gcp-org"; data: GCPOrgFormData; onDashboard: () => void };
+  | { flowType: "gcp-org"; data: GCPOrgFormData; onDashboard: () => void }
+  | { flowType: "oci-standalone"; data: OCIStandaloneFormData; onDashboard: () => void }
+  | { flowType: "oci-org"; data: OCIOrgFormData; onDashboard: () => void };
 
 const BADGE_CONFIG: Record<PostOnboardingOverviewProps["flowType"], { label: string; color: string }> = {
   standalone: { label: "AWS Account Connected", color: "bg-[#F0FDF4] text-[#16A34A] border-[#86EFAC]" },
-  org: { label: "3 Organizations Connected", color: "bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]" },
+  org: { label: "4 Organizations Connected", color: "bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]" },
   "azure-standalone": { label: "Azure Subscription Connected", color: "bg-[#EFF6FF] text-[#0078D4] border-[#BFDBFE]" },
-  "azure-org": { label: "3 Organizations Connected", color: "bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]" },
+  "azure-org": { label: "4 Organizations Connected", color: "bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]" },
   "gcp-standalone": { label: "GCP Project Connected", color: "bg-[#E8F0FE] text-[#4285F4] border-[#AECBFA]" },
-  "gcp-org": { label: "3 Organizations Connected", color: "bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]" },
+  "gcp-org": { label: "4 Organizations Connected", color: "bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]" },
+  "oci-standalone": { label: "OCI Tenancy Connected", color: "bg-[#FEF2EE] text-[#C74634] border-[#FECACA]" },
+  "oci-org": { label: "4 Organizations Connected", color: "bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]" },
 };
 
 const SUBTITLE_CONFIG: Record<PostOnboardingOverviewProps["flowType"], string> = {
@@ -899,6 +1078,8 @@ const SUBTITLE_CONFIG: Record<PostOnboardingOverviewProps["flowType"], string> =
   "azure-org": "Your Azure Organization has been connected. All connected cloud organizations are shown below.",
   "gcp-standalone": "Your GCP project has been connected to AccuKnox. Scanning is underway.",
   "gcp-org": "Your GCP Organization has been connected. All connected cloud organizations are shown below.",
+  "oci-standalone": "Your OCI tenancy has been connected to AccuKnox. Scanning is underway.",
+  "oci-org": "Your OCI Organization has been connected. All connected cloud organizations are shown below.",
 };
 
 export function PostOnboardingOverview(props: PostOnboardingOverviewProps) {
@@ -906,10 +1087,11 @@ export function PostOnboardingOverview(props: PostOnboardingOverviewProps) {
   const badge = BADGE_CONFIG[props.flowType];
   const isAzure = props.flowType === "azure-standalone" || props.flowType === "azure-org";
   const isGCP = props.flowType === "gcp-standalone" || props.flowType === "gcp-org";
-  const accentBorder = isAzure ? "border-[#0078D4]" : isGCP ? "border-[#4285F4]" : "border-[#2563EB]";
-  const accentText = isAzure ? "text-[#0078D4]" : isGCP ? "text-[#4285F4]" : "text-[#2563EB]";
-  const accentHover = isGCP ? "hover:bg-[#E8F0FE]" : "hover:bg-[#EFF6FF]";
-  const primaryBg = isAzure ? "bg-[#0078D4] hover:bg-[#106EBE]" : isGCP ? "bg-[#4285F4] hover:bg-[#3367D6]" : "bg-[#2563EB] hover:bg-[#1D4ED8]";
+  const isOCI = props.flowType === "oci-standalone" || props.flowType === "oci-org";
+  const accentBorder = isAzure ? "border-[#0078D4]" : isGCP ? "border-[#4285F4]" : isOCI ? "border-[#C74634]" : "border-[#2563EB]";
+  const accentText = isAzure ? "text-[#0078D4]" : isGCP ? "text-[#4285F4]" : isOCI ? "text-[#C74634]" : "text-[#2563EB]";
+  const accentHover = isGCP ? "hover:bg-[#E8F0FE]" : isOCI ? "hover:bg-[#FEF2EE]" : "hover:bg-[#EFF6FF]";
+  const primaryBg = isAzure ? "bg-[#0078D4] hover:bg-[#106EBE]" : isGCP ? "bg-[#4285F4] hover:bg-[#3367D6]" : isOCI ? "bg-[#C74634] hover:bg-[#A8372A]" : "bg-[#2563EB] hover:bg-[#1D4ED8]";
 
   return (
     <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
@@ -950,9 +1132,11 @@ export function PostOnboardingOverview(props: PostOnboardingOverviewProps) {
         {props.flowType === "standalone" && <StandaloneContent data={props.data} />}
         {props.flowType === "azure-standalone" && <AzureStandaloneContent data={props.data} />}
         {props.flowType === "gcp-standalone" && <GCPStandaloneContent data={props.data} />}
+        {props.flowType === "oci-standalone" && <OCIStandaloneContent data={props.data} />}
         {props.flowType === "org" && <MultiCloudOrgOverview activeCloud="aws" data={props.data} />}
         {props.flowType === "azure-org" && <MultiCloudOrgOverview activeCloud="azure" data={props.data} />}
         {props.flowType === "gcp-org" && <MultiCloudOrgOverview activeCloud="gcp" data={props.data} />}
+        {props.flowType === "oci-org" && <MultiCloudOrgOverview activeCloud="oci" data={props.data} />}
 
         {/* Amber migration banner — always shown */}
         <AmberMigrationBanner />

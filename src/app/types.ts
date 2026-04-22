@@ -201,3 +201,83 @@ export const GCP_AUTO_GENERATED = {
   scriptStandaloneUrl: "https://storage.googleapis.com/accuknox-scripts/v1/standalone.sh",
   scriptOrgUrl: "https://storage.googleapis.com/accuknox-scripts/v1/org.sh",
 };
+
+/* ─── OCI ─── */
+
+export interface OCIStandaloneFormData {
+  displayName: string;
+  tenancyOcid: string;
+  homeRegion: string;
+  label: string;
+  tag: string;
+  permissions: {
+    monitoring: boolean;
+    remediation: boolean;
+    dataScanning: boolean;
+    workloadVMs: boolean;
+    workloadContainers: boolean;
+  };
+  compartmentScope: "all" | "include" | "exclude";
+  compartmentIds: string;
+}
+
+export interface OCIOrgFormData {
+  displayName: string;
+  adminTenancyOcid: string;
+  homeRegion: string;
+  permissions: {
+    monitoring: boolean;
+    remediation: boolean;
+    dataScanning: boolean;
+    workloadVMs: boolean;
+    workloadContainers: boolean;
+  };
+  autoSyncTenancies: boolean;
+  compartmentScope: "all" | "include" | "exclude";
+  compartmentIds: string;
+  scope: "all" | "include" | "exclude";
+  rootTenancyOcid: string;
+  scopeIds: string;
+}
+
+export const OCI_STANDALONE_STEPS = [
+  "Tenancy Details",
+  "Permissions",
+  "Deploy via Cloud Shell",
+  "Review & Complete",
+];
+
+export const OCI_ORG_STEPS = [
+  "Organization Details",
+  "Permissions",
+  "Deploy via Cloud Shell",
+  "Scope",
+  "Review & Complete",
+];
+
+export const OCI_AUTO_GENERATED = {
+  verificationToken: "ak-oci-vt-9f3e2b1a8c7d",
+  iamUserName: "accuknox_security_audit_user",
+  groupName: "accuknox-security-group",
+  policyName: "accuknox-security-policy",
+  callbackEndpoint: "https://api.accuknox.com/integrations/oci/callback",
+  scriptStandaloneUrl: "https://objectstorage.us-ashburn-1.oraclecloud.com/p/accuknox/n/accuknox/b/scripts/o/v1/standalone.sh",
+  scriptOrgUrl: "https://objectstorage.us-ashburn-1.oraclecloud.com/p/accuknox/n/accuknox/b/scripts/o/v1/org.sh",
+};
+
+export const OCI_REGIONS = [
+  { value: "us-ashburn-1", label: "US East (Ashburn)" },
+  { value: "us-phoenix-1", label: "US West (Phoenix)" },
+  { value: "us-sanjose-1", label: "US West (San Jose)" },
+  { value: "eu-frankfurt-1", label: "Germany Central (Frankfurt)" },
+  { value: "eu-amsterdam-1", label: "Netherlands Northwest (Amsterdam)" },
+  { value: "eu-london-1", label: "UK South (London)" },
+  { value: "ap-tokyo-1", label: "Japan East (Tokyo)" },
+  { value: "ap-osaka-1", label: "Japan West (Osaka)" },
+  { value: "ap-mumbai-1", label: "India West (Mumbai)" },
+  { value: "ap-sydney-1", label: "Australia East (Sydney)" },
+  { value: "ca-toronto-1", label: "Canada Southeast (Toronto)" },
+  { value: "sa-saopaulo-1", label: "Brazil East (São Paulo)" },
+  { value: "me-dubai-1", label: "UAE East (Dubai)" },
+  { value: "il-jerusalem-1", label: "Israel Central (Jerusalem)" },
+];
