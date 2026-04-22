@@ -1,6 +1,6 @@
 # Cloud Onboarding User Journey
 
-This is a prototype of the proposed user journey flow for cloud account. It covers the full onboarding experience across AWS, Azure, and GCP — including both standalone account and organization-level flows.
+This is a prototype of the proposed user journey flow for cloud account. It covers the full onboarding experience across AWS, Azure, and GCP, including both standalone account and organization-level flows.
 
 ## Running locally
 
